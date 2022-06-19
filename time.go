@@ -134,6 +134,16 @@ func (t Time) BeforeOrEqual(rhs Time) bool {
 	return t.t.Before(rhs.t) || t.t.Equal(rhs.t)
 }
 
+// Between returns true if t is in the exclusive time range (start, end)
+func (t Time) Between(start, end Time) bool {
+	return t.t.After(start.t) && t.t.Before(end.t)
+}
+
+// BetweenOrEqual returns true if t is in the inclusive time range [start, end]
+func (t Time) BetweenOrEqual(start, end Time) bool {
+	return t.AfterOrEqual(start) && t.BeforeOrEqual(end)
+}
+
 // Equal returns true if rhs == d
 func (t Time) Equal(rhs Time) bool {
 	return t.t.Equal(rhs.t)
@@ -287,6 +297,11 @@ func (t Time) Value() (driver.Value, error) {
 
 // Scan implements sql.Scanner. SQL requires the use of ISO8601.
 func (t *Time) Scan(value any) error {
+	if value == nil {
+		t.t = time.Time{}
+		return nil
+	}
+
 	switch v := value.(type) {
 	case int64:
 		// Assume this is a unix timestamp
@@ -309,6 +324,9 @@ func (t *Time) Scan(value any) error {
 			return fmt.Errorf("failed to scan time (%q): %w", v, err)
 		}
 		t.t = newt
+		return nil
+	case time.Time:
+		*t = TimeFromStdTime(v)
 		return nil
 	}
 

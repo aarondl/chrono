@@ -138,6 +138,12 @@ func TestDateTimeComparisons(t *testing.T) {
 	if !chrono.DateTimeFromNow().AfterOrEqual(ref) {
 		t.Error("it should be after the ref date")
 	}
+	if ref.After(chrono.DateTimeFromNow()) {
+		t.Error("ref should not be after now")
+	}
+	if ref.AfterOrEqual(chrono.DateTimeFromNow()) {
+		t.Error("ref should not be after now")
+	}
 
 	// Before
 	if !ref.Before(chrono.DateTimeFromNow()) {
@@ -145,6 +151,40 @@ func TestDateTimeComparisons(t *testing.T) {
 	}
 	if !ref.BeforeOrEqual(chrono.DateTimeFromNow()) {
 		t.Error("it should be before the ref date")
+	}
+	if chrono.DateTimeFromNow().Before(ref) {
+		t.Error("now should not be before the ref date")
+	}
+	if chrono.DateTimeFromNow().BeforeOrEqual(ref) {
+		t.Error("now should not be before the ref date")
+	}
+
+	// Between
+	before := chrono.NewDateTime(2000, 1, 1, 0, 0, 0, 0, time.UTC)
+	after := chrono.NewDateTime(2000, 1, 3, 0, 0, 0, 0, time.UTC)
+	if !ref.Between(before, after) {
+		t.Error("it should be between")
+	}
+	if chrono.DateTimeFromNow().Between(before, after) {
+		t.Error("now should not be between")
+	}
+	if ref.Between(ref, after) {
+		t.Error("it should not be between because exclusive")
+	}
+	if ref.Between(before, ref) {
+		t.Error("it should not be between")
+	}
+	if !ref.BetweenOrEqual(before, after) {
+		t.Error("it should be between")
+	}
+	if chrono.DateTimeFromNow().BetweenOrEqual(before, after) {
+		t.Error("now should not be between")
+	}
+	if !ref.BetweenOrEqual(ref, after) {
+		t.Error("it should be between")
+	}
+	if !ref.BetweenOrEqual(before, ref) {
+		t.Error("it should be between")
 	}
 }
 
@@ -333,6 +373,14 @@ func TestDateTimeSQL(t *testing.T) {
 
 	datetime = chrono.DateTime{}
 	if err := datetime.Scan(float64(ref.Unix())); err != nil {
+		t.Error(err)
+	}
+	if !datetime.Equal(ref) {
+		t.Error("value was wrong")
+	}
+
+	datetime = chrono.DateTime{}
+	if err := datetime.Scan(ref.ToStdTime()); err != nil {
 		t.Error(err)
 	}
 	if !datetime.Equal(ref) {

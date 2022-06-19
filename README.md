@@ -19,4 +19,38 @@ the exception of SQL handling in which case it attempts to be closer to the SQL 
 # Examples
 
 ```go
+// Creating values
+datetime := chrono.NewDateTime(2000, 1, 2, 3, 4, 5, 10, time.UTC)
+date := chrono.NewDate(2000, 1, 2)
+time := chrono.NewDateTime(3, 4, 5, 10, time.UTC)
+
+// Unix timestamp interop
+datetime = chrono.DateTimeFromUnix(1655610143, 0)
+date = chrono.DateFromUnix(1655610143, 0)
+time = chrono.TimeFromUnix(1655610143, 0)
+
+// Creating values from strings (RFC3339), see 'Layout' variant functions for
+// functionality from the std library for parsing custom formats.
+datetime = chrono.DateTimeFromString("2000-01-02T03:04:05Z")
+date = chrono.DateTimeFromString("2000-01-02")
+time = chrono.DateTimeFromString("03:04:05Z")
+
+// Conversion from/to time.Time
+datetime = chrono.DateTimeFromStdTime(time.Now())
+date = chrono.DateFromStdTime(time.Now())
+time = chrono.TimeFromStdTime(time.Now())
+datetime.ToStdTime()
+date.ToStdTime()
+time.ToStdTime()
+
+// Additional comparisons on top of the stdlib After/Before/Equal
+datetime.AfterOrEqual(datetime)
+datetime.BeforeOrEqual(datetime)
+datetime.Between(datetime)
+datetime.BetweenOrEqual(datetime)
+
+// Formatting is all done with RFC3339 parts
+datetime.String() // "2000-01-02T03:04:05Z"
+date.String()     // "2000-01-02"
+time.String()     // "03:04:05Z"
 ```

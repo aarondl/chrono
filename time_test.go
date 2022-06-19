@@ -128,18 +128,58 @@ func TestTimeComparisons(t *testing.T) {
 
 	// After
 	if !chrono.TimeFromNow().After(ref) {
-		t.Error("it should be after the ref date")
+		t.Error("it should be after the ref time")
 	}
 	if !chrono.TimeFromNow().AfterOrEqual(ref) {
-		t.Error("it should be after the ref date")
+		t.Error("it should be after the ref time")
+	}
+	if ref.After(chrono.TimeFromNow()) {
+		t.Error("ref should not be after now")
+	}
+	if ref.AfterOrEqual(chrono.TimeFromNow()) {
+		t.Error("ref should not be after now")
 	}
 
 	// Before
 	if !ref.Before(chrono.TimeFromNow()) {
-		t.Error("it should be before the ref date")
+		t.Error("it should be before the ref time")
 	}
 	if !ref.BeforeOrEqual(chrono.TimeFromNow()) {
-		t.Error("it should be before the ref date")
+		t.Error("it should be before the ref time")
+	}
+	if chrono.TimeFromNow().Before(ref) {
+		t.Error("now should not be before the ref time")
+	}
+	if chrono.TimeFromNow().BeforeOrEqual(ref) {
+		t.Error("now should not be before the ref time")
+	}
+
+	// Between
+	before := chrono.NewTime(1, 0, 0, 0, time.UTC)
+	after := chrono.NewTime(4, 0, 0, 0, time.UTC)
+	if !ref.Between(before, after) {
+		t.Error("it should be between")
+	}
+	if chrono.TimeFromNow().Between(before, after) {
+		t.Error("now should not be between")
+	}
+	if ref.Between(ref, after) {
+		t.Error("it should not be between because exclusive")
+	}
+	if ref.Between(before, ref) {
+		t.Error("it should not be between")
+	}
+	if !ref.BetweenOrEqual(before, after) {
+		t.Error("it should be between")
+	}
+	if chrono.TimeFromNow().BetweenOrEqual(before, after) {
+		t.Error("now should not be between")
+	}
+	if !ref.BetweenOrEqual(ref, after) {
+		t.Error("it should be between")
+	}
+	if !ref.BetweenOrEqual(before, ref) {
+		t.Error("it should be between")
 	}
 }
 
@@ -282,6 +322,14 @@ func TestTimeSQL(t *testing.T) {
 
 	newt = chrono.Time{}
 	if err := newt.Scan(float64(946695845)); err != nil {
+		t.Error(err)
+	}
+	if !newt.Equal(ref) {
+		t.Error("value was wrong")
+	}
+
+	newt = chrono.Time{}
+	if err := newt.Scan(ref.ToStdTime()); err != nil {
 		t.Error(err)
 	}
 	if !newt.Equal(ref) {

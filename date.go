@@ -111,6 +111,16 @@ func (d Date) BeforeOrEqual(rhs Date) bool {
 	return d.t.Before(rhs.t) || d.t.Equal(rhs.t)
 }
 
+// Between returns true if d is in the exclusive time range (start, end)
+func (d Date) Between(start, end Date) bool {
+	return d.t.After(start.t) && d.t.Before(end.t)
+}
+
+// BetweenOrEqual returns true if d is in the inclusive time range [start, end]
+func (d Date) BetweenOrEqual(start, end Date) bool {
+	return d.AfterOrEqual(start) && d.BeforeOrEqual(end)
+}
+
 // Date returns the date's components
 func (d Date) Date() (year int, month time.Month, day int) {
 	return d.t.Date()
@@ -258,6 +268,11 @@ func (d Date) Value() (driver.Value, error) {
 
 // Scan implements sql.Scanner. SQL requires the use of ISO8601.
 func (d *Date) Scan(value any) error {
+	if value == nil {
+		d.t = time.Time{}
+		return nil
+	}
+
 	switch v := value.(type) {
 	case int64:
 		// Assume this is a unix timestamp
@@ -280,6 +295,9 @@ func (d *Date) Scan(value any) error {
 			return fmt.Errorf("failed to scan date (%q): %w", v, err)
 		}
 		d.t = t
+		return nil
+	case time.Time:
+		*d = DateFromStdTime(v)
 		return nil
 	}
 
