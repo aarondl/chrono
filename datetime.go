@@ -7,7 +7,10 @@ import (
 )
 
 const (
-	dateTimeSQLLayout = "2006-01-02 15:04:05-07"
+	// DateTimeSQLLayout is exported so you can change this for your project
+	// but the default should be sufficient. It used microsecond precision
+	// to align with postgresq/mysql.
+	DateTimeSQLLayout = "2006-01-02 15:04:05.999999-07"
 )
 
 // DateTime is mostly a pass-through wrapper for time.Time. This allows
@@ -352,7 +355,7 @@ func (d DateTime) Zone() (name string, offset int) {
 
 // Value implements driver.Valuer. SQL requires the use of ISO8601.
 func (d DateTime) Value() (driver.Value, error) {
-	return d.t.Format(dateTimeSQLLayout), nil
+	return d.t.Format(DateTimeSQLLayout), nil
 }
 
 // Scan implements sql.Scanner. SQL requires the use of ISO8601.
@@ -372,14 +375,14 @@ func (d *DateTime) Scan(value any) error {
 		d.t = time.Unix(int64(v), 0).UTC()
 		return nil
 	case string:
-		t, err := time.Parse(dateTimeSQLLayout, v)
+		t, err := time.Parse(DateTimeSQLLayout, v)
 		if err != nil {
 			return fmt.Errorf("failed to scan datetime (%q): %w", v, err)
 		}
 		d.t = t
 		return nil
 	case []byte:
-		t, err := time.Parse(dateTimeSQLLayout, string(v))
+		t, err := time.Parse(DateTimeSQLLayout, string(v))
 		if err != nil {
 			return fmt.Errorf("failed to scan datetime (%q): %w", v, err)
 		}

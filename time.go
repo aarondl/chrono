@@ -9,7 +9,10 @@ import (
 const (
 	timeLayout       = "15:04:05Z07:00"
 	quotedTimeLayout = `"` + timeLayout + `"`
-	timeSQLLayout    = "15:04:05-07"
+	// TimeSQLLayout is exported so you can change this for your project
+	// but the default should be sufficient. It used microsecond precision
+	// to align with postgresq/mysql.
+	TimeSQLLayout = "15:04:05.999999-07"
 )
 
 // Time is mostly a pass-through wrapper for time.Time. This allows
@@ -292,7 +295,7 @@ func (t Time) Zone() (name string, offset int) {
 
 // Value implements driver.Valuer
 func (t Time) Value() (driver.Value, error) {
-	return t.t.Format(timeSQLLayout), nil
+	return t.t.Format(TimeSQLLayout), nil
 }
 
 // Scan implements sql.Scanner. SQL requires the use of ISO8601.
@@ -312,14 +315,14 @@ func (t *Time) Scan(value any) error {
 		*t = TimeFromUnix(int64(v), 0)
 		return nil
 	case string:
-		newt, err := time.Parse(timeSQLLayout, v)
+		newt, err := time.Parse(TimeSQLLayout, v)
 		if err != nil {
 			return fmt.Errorf("failed to scan time (%q): %w", v, err)
 		}
 		t.t = newt
 		return nil
 	case []byte:
-		newt, err := time.Parse(timeSQLLayout, string(v))
+		newt, err := time.Parse(TimeSQLLayout, string(v))
 		if err != nil {
 			return fmt.Errorf("failed to scan time (%q): %w", v, err)
 		}
