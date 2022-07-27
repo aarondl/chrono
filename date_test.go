@@ -70,6 +70,11 @@ func TestDateModifications(t *testing.T) {
 	if !dt.Equal(chrono.NewDate(2000, 1, 3)) {
 		t.Error("should be equal", dt)
 	}
+
+	diff := ref.Sub(chrono.NewDate(2000, 1, 3))
+	if diff.Hours() != 24 {
+		t.Error("wrong difference", diff)
+	}
 }
 
 func TestDateComparisons(t *testing.T) {
