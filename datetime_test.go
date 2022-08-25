@@ -73,6 +73,36 @@ func TestDateTimeConversions(t *testing.T) {
 	if !cmp.Equal(stdTime) {
 		t.Error("should be equal")
 	}
+
+	cnvTime := dt.ToTime()
+	cnvDate := dt.ToDate()
+
+	ya, ma, da := cnvDate.Date()
+	if ya != stdTime.Year() {
+		t.Error("year was wrong:", ya)
+	}
+	if ma != stdTime.Month() {
+		t.Error("month was wrong:", ma)
+	}
+	if da != stdTime.Day() {
+		t.Error("day was wrong:", da)
+	}
+
+	if cnvTime.Hour() != stdTime.Hour() {
+		t.Error("hour is wrong")
+	}
+	if cnvTime.Minute() != stdTime.Minute() {
+		t.Error("min is wrong")
+	}
+	if cnvTime.Second() != stdTime.Second() {
+		t.Error("second is wrong")
+	}
+	if cnvTime.Nanosecond() != stdTime.Nanosecond() {
+		t.Error("ns is wrong")
+	}
+	if cnvTime.Location() != stdTime.Location() {
+		t.Error("location is wrong")
+	}
 }
 
 func TestDateTimeModifications(t *testing.T) {

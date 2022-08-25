@@ -101,6 +101,23 @@ func (d DateTime) ToStdTime() time.Time {
 	return d.t
 }
 
+// ToDate discards the time component of this datetime to convert it into
+// a date.
+//
+// The timezone is discarded along with the time, so the date will be whatever
+// it was in the timezone, it is not converted to UTC or anything before the
+// conversion.
+func (d DateTime) ToDate() Date {
+	year, month, day := d.Date()
+	return NewDate(year, month, day)
+}
+
+// ToTime discards the date component of this datetime to convert it into a
+// time.
+func (d DateTime) ToTime() Time {
+	return NewTime(d.t.Hour(), d.t.Minute(), d.t.Second(), d.t.Nanosecond(), d.t.Location())
+}
+
 // Add returns the time t+d.
 func (d DateTime) Add(dur time.Duration) DateTime {
 	return DateTime{t: d.t.Add(dur)}

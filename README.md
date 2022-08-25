@@ -43,6 +43,11 @@ datetime.ToStdTime()
 date.ToStdTime()
 time.ToStdTime()
 
+// Conversions between DateTime/Date/Time
+datetime = chrono.DateTimeFromStdTime(time.Now())
+date = datetime.ToDate()
+time = datetime.ToTime()
+
 // Additional comparisons on top of the stdlib After/Before/Equal
 datetime.AfterOrEqual(datetime)
 datetime.BeforeOrEqual(datetime)
