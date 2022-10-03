@@ -303,3 +303,8 @@ func (d *Date) Scan(value any) error {
 
 	return fmt.Errorf("failed to scan type '%T' into date", value)
 }
+
+// Sub returns the duration between the two dates
+func (d Date) Sub(u Date) time.Duration {
+	return d.t.Sub(u.t)
+}
