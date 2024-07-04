@@ -89,8 +89,7 @@ func (d Date) AddDate(years int, months int, days int) Date {
 func (d Date) AddMonthsNoOverflow(m int) Date {
 	addedDate := d.AddDate(0, m, 0)
 	if d.Day() != addedDate.Day() {
-		d = addedDate
-		return d.PreviousMonthLastDay()
+		return addedDate.PreviousMonthLastDay()
 	}
 
 	return addedDate

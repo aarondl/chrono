@@ -309,90 +309,62 @@ func TestDateSQL(t *testing.T) {
 	}
 }
 
+var monthToDays = map[time.Month]int{
+	1:  31,
+	2:  29,
+	3:  31,
+	4:  30,
+	5:  31,
+	6:  30,
+	7:  31,
+	8:  31,
+	9:  30,
+	10: 31,
+	11: 30,
+	12: 31,
+}
+
 func TestAddMonthsNoOverflow(t *testing.T) {
 	t.Parallel()
 
-	t.Run("AddOneMonthToJanuary", func(t *testing.T) {
-		ref := chrono.NewDate(2024, 1, 31)
-		dt := ref.AddMonthsNoOverflow(1)
-		if !dt.Equal(chrono.NewDate(2024, 2, 29)) {
-			t.Error("should be equal", dt)
+	for month, days := range monthToDays {
+		if month == 12 {
+			continue
 		}
-	})
-
-	t.Run("AddOneMonthToMarch", func(t *testing.T) {
-		ref := chrono.NewDate(2024, 3, 31)
-		dt := ref.AddMonthsNoOverflow(1)
-		if !dt.Equal(chrono.NewDate(2024, 4, 30)) {
-			t.Error("should be equal", dt)
-		}
-	})
-
-	t.Run("AddOneMonthToMay", func(t *testing.T) {
-		ref := chrono.NewDate(2024, 5, 31)
-		dt := ref.AddMonthsNoOverflow(1)
-		if !dt.Equal(chrono.NewDate(2024, 6, 30)) {
-			t.Error("should be equal", dt)
-		}
-	})
-
-	t.Run("AddOneMonthToAugust", func(t *testing.T) {
-		ref := chrono.NewDate(2024, 8, 31)
-		dt := ref.AddMonthsNoOverflow(1)
-		if !dt.Equal(chrono.NewDate(2024, 9, 30)) {
-			t.Error("should be equal", dt)
-		}
-	})
-
-	t.Run("AddOneMonthToSeptember", func(t *testing.T) {
-		ref := chrono.NewDate(2024, 10, 31)
-		dt := ref.AddMonthsNoOverflow(1)
-		if !dt.Equal(chrono.NewDate(2024, 11, 30)) {
-			t.Error("should be equal", dt)
-		}
-	})
+		t.Run("AddOneMonthTo"+time.Month(month).String(), func(t *testing.T) {
+			ref := chrono.NewDate(2024, month, days)
+			dt := ref.AddMonthsNoOverflow(1)
+			nextMonth := month + 1
+			nextMonthNumOfDays := monthToDays[nextMonth]
+			if !dt.Equal(chrono.NewDate(2024, nextMonth, Min(nextMonthNumOfDays, days))) {
+				t.Error("should be equal", dt)
+			}
+		})
+	}
 }
 
 func TestSubtractMonthsNoOverflow(t *testing.T) {
 	t.Parallel()
 
-	t.Run("SubtractOneMonthFromMarch", func(t *testing.T) {
-		ref := chrono.NewDate(2024, 3, 31)
-		dt := ref.AddMonthsNoOverflow(-1)
-		if !dt.Equal(chrono.NewDate(2024, 2, 29)) {
-			t.Error("should be equal", dt)
+	for month, days := range monthToDays {
+		if month == 1 {
+			continue
 		}
-	})
+		t.Run("SubtractOneMonthFrom"+time.Month(month).String(), func(t *testing.T) {
+			ref := chrono.NewDate(2024, month, days)
+			dt := ref.AddMonthsNoOverflow(-1)
+			previousMonth := month - 1
+			previousMonthNumOfDays := monthToDays[previousMonth]
+			if !dt.Equal(chrono.NewDate(2024, previousMonth, Min(previousMonthNumOfDays, days))) {
+				t.Error("should be equal", dt)
+			}
+		})
+	}
+}
 
-	t.Run("SubtractOneMonthFromMai", func(t *testing.T) {
-		ref := chrono.NewDate(2024, 5, 31)
-		dt := ref.AddMonthsNoOverflow(-1)
-		if !dt.Equal(chrono.NewDate(2024, 4, 30)) {
-			t.Error("should be equal", dt)
-		}
-	})
-
-	t.Run("SubtractOneMonthFromJuly", func(t *testing.T) {
-		ref := chrono.NewDate(2024, 7, 31)
-		dt := ref.AddMonthsNoOverflow(-1)
-		if !dt.Equal(chrono.NewDate(2024, 6, 30)) {
-			t.Error("should be equal", dt)
-		}
-	})
-
-	t.Run("SubtractOneMonthFromOctober", func(t *testing.T) {
-		ref := chrono.NewDate(2024, 10, 31)
-		dt := ref.AddMonthsNoOverflow(-1)
-		if !dt.Equal(chrono.NewDate(2024, 9, 30)) {
-			t.Error("should be equal", dt)
-		}
-	})
-
-	t.Run("SubtractOneMonthFromDecember", func(t *testing.T) {
-		ref := chrono.NewDate(2024, 12, 31)
-		dt := ref.AddMonthsNoOverflow(-1)
-		if !dt.Equal(chrono.NewDate(2024, 11, 30)) {
-			t.Error("should be equal", dt)
-		}
-	})
+func Min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
