@@ -83,6 +83,25 @@ func (d Date) AddDate(years int, months int, days int) Date {
 	return DateFromStdTime(d.t.AddDate(years, months, days))
 }
 
+// AddMonthsNoOverflow adds a month to the current time, not overflowing in case the
+// destination month has less days than the current one.
+// Positive value travels forward while negative value travels into the past.
+func (d Date) AddMonthsNoOverflow(m int) Date {
+	addedDate := d.AddDate(0, m, 0)
+	if d.Day() != addedDate.Day() {
+		d = addedDate
+		return d.PreviousMonthLastDay()
+	}
+
+	return addedDate
+}
+
+// PreviousMonthLastDay returns the last day of the previous month.
+func (d Date) PreviousMonthLastDay() Date {
+	year, month, _ := d.Date()
+	return NewDate(year, month, 0) // 0 makes it wrap to last month
+}
+
 // After returns true if rhs is after d
 func (d Date) After(rhs Date) bool {
 	return d.t.After(rhs.t)
