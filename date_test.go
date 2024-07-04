@@ -2,6 +2,8 @@ package chrono_test
 
 import (
 	"bytes"
+	"math/rand"
+	"strconv"
 	"testing"
 	"time"
 
@@ -356,6 +358,46 @@ func TestSubtractMonthsNoOverflow(t *testing.T) {
 			previousMonth := month - 1
 			previousMonthNumOfDays := monthToDays[previousMonth]
 			if !dt.Equal(chrono.NewDate(2024, previousMonth, Min(previousMonthNumOfDays, days))) {
+				t.Error("should be equal", dt)
+			}
+		})
+	}
+}
+
+func TestAddNoMonthsOverflow(t *testing.T) {
+	t.Parallel()
+
+	for month, days := range monthToDays {
+		if month == 12 {
+			continue
+		}
+		t.Run("AddNoMonthTo"+time.Month(month).String(), func(t *testing.T) {
+			ref := chrono.NewDate(2024, month, days)
+			dt := ref.AddMonthsNoOverflow(0)
+			if !dt.Equal(ref) {
+				t.Error("should be equal", dt)
+			}
+		})
+	}
+}
+
+func TestRandomAddMonthsNoOverflow(t *testing.T) {
+	t.Parallel()
+
+	for month, days := range monthToDays {
+		if month == 12 {
+			continue
+		}
+		monthsToAdd := rand.Intn(12 - int(month) + 1)
+
+		t.Run("Add"+strconv.Itoa(monthsToAdd)+"MonthTo"+time.Month(month).String(), func(t *testing.T) {
+			ref := chrono.NewDate(2024, month, days)
+			dt := ref.AddMonthsNoOverflow(monthsToAdd)
+
+			// add a random number of months but do not exceed current year
+			nextMonth := month + time.Month(monthsToAdd)
+			nextMonthNumOfDays := monthToDays[nextMonth]
+			if !dt.Equal(chrono.NewDate(2024, nextMonth, Min(nextMonthNumOfDays, days))) {
 				t.Error("should be equal", dt)
 			}
 		})
