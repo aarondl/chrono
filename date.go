@@ -83,12 +83,12 @@ func (d Date) AddDate(years int, months int, days int) Date {
 	return DateFromStdTime(d.t.AddDate(years, months, days))
 }
 
-// After returns true if rhs is after d
+// After returns true if d is after rhs
 func (d Date) After(rhs Date) bool {
 	return d.t.After(rhs.t)
 }
 
-// AfterOrEqual returns true if rhs is equal to or after d
+// AfterOrEqual returns true if d is equal to or after rhs
 func (d Date) AfterOrEqual(rhs Date) bool {
 	return d.t.After(rhs.t) || d.t.Equal(rhs.t)
 }
@@ -101,12 +101,12 @@ func (d Date) AppendFormat(b []byte, layout string) []byte {
 	return d.t.AppendFormat(b, layout)
 }
 
-// Before returns true if rhs is before d
+// Before returns true if d is before rhs
 func (d Date) Before(rhs Date) bool {
 	return d.t.Before(rhs.t)
 }
 
-// BeforeOrEqual returns true if rhs is before d
+// BeforeOrEqual returns true if d is before rhs
 func (d Date) BeforeOrEqual(rhs Date) bool {
 	return d.t.Before(rhs.t) || d.t.Equal(rhs.t)
 }
