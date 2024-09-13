@@ -106,7 +106,7 @@ func (d Date) Before(rhs Date) bool {
 	return d.t.Before(rhs.t)
 }
 
-// BeforeOrEqual returns true if d is before rhs
+// BeforeOrEqual returns true if d is equal to or before rhs
 func (d Date) BeforeOrEqual(rhs Date) bool {
 	return d.t.Before(rhs.t) || d.t.Equal(rhs.t)
 }
